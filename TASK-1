@@ -1,0 +1,47 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+const int buttonPin = 2;  // Push button connected to pin 2
+int buttonState;
+int lastButtonState = HIGH;  // Default HIGH (Pull-up resistor enabled)
+int counter = 0;
+
+// Initialize I2C LCD (0x27 is the default address for most 16x2 LCDs)
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+    pinMode(buttonPin, INPUT_PULLUP);  // Internal pull-up resistor keeps it HIGH
+    Serial.begin(9600);  // Initialize Serial Monitor
+    
+    // Initialize LCD Display
+    lcd.init();
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("Push Counter: 0");  // Initial display message
+
+    Serial.println("Push Button Counter Ready...");
+    Serial.print("Count: ");
+    Serial.println(counter);
+}
+
+void loop() {
+    buttonState = digitalRead(buttonPin);
+
+    if (buttonState == LOW && lastButtonState == HIGH) {  
+        delay(200);  // Simple debounce delay
+        counter++;  // Increment counter
+
+        // Print to Serial Monitor
+        Serial.print("Count: ");
+        Serial.println(counter);
+
+        // Update LCD Display
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Push Counter: ");
+        lcd.setCursor(0, 1);
+        lcd.print(counter);
+    }
+
+    lastButtonState = buttonState;  // Update last button state
+}
